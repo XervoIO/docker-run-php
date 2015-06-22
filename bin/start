@@ -1,0 +1,46 @@
+#!/bin/bash
+set -e
+
+mkdir -p /mnt/tmp/nginx
+mkdir -p /mnt/home/nginx
+
+PHPVERSION=php-5.4.38
+PHPINI=/mnt/home/php.ini
+PHPFPMCONF=/mnt/home/php-fpm.conf
+
+PHPPID=/mnt/home/php-fpm.pid
+NGINXPID=/mnt/home/nginx.pid
+
+AVAILABLE=( "5.3.29" "5.4.38" "5.5.22" "5.6.6" )
+
+if [[ $MODULUS_CONFIG_ENGINES_PHP ]]; then
+  for version in "${AVAILABLE[@]}"; do
+    if [[ $MODULUS_CONFIG_ENGINES_PHP == $version ]]; then
+      PHPVERSION="php-$version"
+    fi
+  done
+fi
+
+SOURCEPHPINI=/opt/modulus/php/$PHPVERSION/etc/php.ini
+SOURCEPHPFPMCONF=/opt/modulus/php/$PHPVERSION/etc/php-fpm.conf
+
+rm -rf $PHPFPMCONF || true
+rm -rf $PHPINI || true
+
+SCALE=.75
+MEMORY_SIZE=$(node -p "Math.floor($SERVO_SIZE * $SCALE)" 2> /dev/null)
+sed -e 's/memory_limit = \(.*\)/memory_limit = '$MEMORY_SIZE'M/g' $SOURCEPHPINI > $PHPINI
+sed -e 's/memory_limit = \(.*\)/memory_limit = '$MEMORY_SIZE'M/g' $SOURCEPHPFPMCONF > $PHPFPMCONF
+
+# If the user specified config files, use as-is.
+if [ -f /mnt/app/php.ini ]; then
+  cp /mnt/app/php.ini $PHPINI
+fi
+
+if [ -f /mnt/app/php-fpm.conf ]; then
+  cp /mnt/app/php-fpm.conf $PHPFPMCONF
+fi
+
+/opt/modulus/php/$PHPVERSION/sbin/php-fpm -c $PHPINI -y $PHPFPMCONF &
+nginx -c /etc/nginx/nginx.conf &
+wait
