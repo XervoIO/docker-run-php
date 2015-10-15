@@ -20,22 +20,21 @@ mkdir /var/lib/nginx/uwsgi
 mkdir /var/lib/nginx/scgi
 
 # Install php-brew
+export MAKEFLAGS="-j $(grep -c ^processor /proc/cpuinfo)"
+mkdir /mnt/tmp
 apt-get build-dep -y php5
-apt-get install -y php5 php5-dev php-pear autoconf automake php5-gd curl build-essential libxslt1-dev re2c libxml2 libxml2-dev php5-cli bison libbz2-dev libreadline-dev
-apt-get install -y libfreetype6 libfreetype6-dev libpng12-0 libpng12-dev libjpeg-dev libjpeg8-dev libjpeg8  libgd-dev libgd3 libxpm4 libltdl7 libltdl-dev
-apt-get install -y libssl-dev openssl
-apt-get install -y gettext libgettextpo-dev libgettextpo0
-apt-get install -y libicu-dev
-apt-get install -y libmhash-dev libmhash2
-apt-get install -y libmcrypt-dev libmcrypt4
-apt-get install -y postgresql-client postgresql-contrib libmysqlclient-dev libmysqld-dev
-apt-get install -y bc 
+apt-get install -y php5 php5-dev php-pear autoconf automake php5-gd curl \
+  build-essential libxslt1-dev re2c libxml2 libxml2-dev php5-cli bison \
+  libbz2-dev libreadline-dev libfreetype6 libfreetype6-dev libpng12-0 \
+  libpng12-dev libjpeg-dev libjpeg8-dev libjpeg8  libgd-dev libgd3 libxpm4 \
+  libltdl7 libltdl-dev libssl-dev openssl gettext libgettextpo-dev \
+  libgettextpo0 libicu-dev libmhash-dev libmhash2 libmcrypt-dev libmcrypt4 \
+  postgresql-client postgresql-contrib libmysqlclient-dev libmysqld-dev bc
 
 # Install phpbrew
 curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew
 chmod +x phpbrew
 mv phpbrew /usr/bin/phpbrew
 
-tar -C /opt/modulus -xvzf /opt/modulus/php-4212015.tar.gz
-rm -rf /opt/modulus/php-4212015.tar.gz
-
+# tar -C /opt/modulus -xvzf /opt/modulus/php-4212015.tar.gz
+# rm -rf /opt/modulus/php-4212015.tar.gz
