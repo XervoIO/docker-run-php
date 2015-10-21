@@ -1,4 +1,7 @@
 #!/bin/bash
+set -e
+set -x
+
 
 # PHP Version to build.  We build 5.3, 5.4, 5.5, and 5.6.
 PHP_5_3="5.3.29"
@@ -43,7 +46,6 @@ apt-get install -y php5 php5-dev php-pear autoconf automake php5-gd curl \
 curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew
 chmod +x phpbrew
 mv phpbrew /usr/bin/phpbrew
-cd $HOME
 
 phpbrew init
 
