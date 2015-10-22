@@ -72,7 +72,12 @@ do
   if phpbrew install php-$PHP_VER $PHP_BREW_FLAGS ; then
     echo "clear_env = no" >> $PHP_BREW_DIR/php/php-$PHP_VER/etc/php-fpm.conf
   else
-    tail -200 $PHP_BREW_DIR/build/php-$PHP_VER/build.log
+    if [ -f $PHP_BREW_DIR/build/php-$PHP_VER/build.log ]; then
+      tail -200 $PHP_BREW_DIR/build/php-$PHP_VER/build.log
+    else
+      echo "Build failed, no log file created."
+      exit 1
+    fi
   fi
 done
 
