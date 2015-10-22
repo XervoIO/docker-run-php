@@ -2,19 +2,23 @@
 set -e
 set -x
 
-
 # PHP Version to build.  We build 5.3, 5.4, 5.5, and 5.6.
 PHP_5_3="5.3.29"
 PHP_5_4="5.4.45"
 PHP_5_5="5.5.30"
 PHP_5_6="5.6.14"
+# Array with php version to compile
+PHP_VERS=($PHP_5_3 $PHP_5_4 $PHP_5_5 $PHP_5_6)
 
+# Variables
 PHP_BREW_DIR=/mnt/home/.phpbrew
-export MAKEFLAGS="-j $(grep -c ^processor /proc/cpuinfo)"
 PHP_INSTALL_DIR=/opt/modulus/php
-PHP_BREW_FLAGS="+default +mysql +pgsql +fpm -- \
+PHP_BREW_FLAGS="+default +mysql +pgsql +fpm +soap +gmp -- \
   --with-libdir=lib/x86_64-linux-gnu --with-gd=shared --enable-gd-natf \
   --with-jpeg-dir=/usr --with-png-dir=/usr"
+
+# Allows compiling with all cpus
+export MAKEFLAGS="-j $(grep -c ^processor /proc/cpuinfo)"
 
 # Install nginx
 echo "deb http://ppa.launchpad.net/nginx/stable/ubuntu $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/nginx-stable.list
@@ -47,18 +51,40 @@ curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew
 chmod +x phpbrew
 mv phpbrew /usr/bin/phpbrew
 
+# phpbrew must be initialized to work.  Will create the folder
+# /mnt/home/.phpbrew
 phpbrew init
+source ~/.phpbrew/bashrc
 
-PHP_VERS=($PHP_5_3 $PHP_5_4 $PHP_5_5 $PHP_5_6)
+# GMP requires gmp.h to be in /usr/include
+if [ ! -f /usr/include/gmp.h ]; then
+  if [ -f /usr/include/x86_64-linux-gnu/gmp.h ]; then
+    ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h
+  else
+    echo "gmp.h not found in /usr/include/x86_64-linux-gnu, can't build."
+    exit 1
+  fi
+fi
+
 # Install PHP
 for PHP_VER in "${PHP_VERS[@]}"
 do
   if phpbrew install php-$PHP_VER $PHP_BREW_FLAGS ; then
-    mv $PHP_BREW_DIR/php/php-$PHP_VER $PHP_INSTALL_DIR/php-$PHP_VER
-    echo "clear_env = no" >> $PHP_INSTALL_DIR/php-$PHP_VER/etc/php-fpm.conf
+    echo "clear_env = no" >> $PHP_BREW_DIR/php/php-$PHP_VER/etc/php-fpm.conf
   else
     tail -200 $PHP_BREW_DIR/build/php-$PHP_VER/build.log
   fi
+done
+
+# Install MONGO support
+# NOTE:  We run this out of the other loop because if we run this in the other
+# loop, the installation of PHP 5.4 will almost always fail because reasons.
+# (I really don't know why it fails, phpbrew just fails to install it)
+for PHP_VER in "${PHP_VERS[@]}"
+do
+  phpbrew use $PHP_VER
+  phpbrew ext install mongo
+  mv $PHP_BREW_DIR/php/php-$PHP_VER $PHP_INSTALL_DIR/php-$PHP_VER
 done
 
 # Clean up
