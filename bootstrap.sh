@@ -88,8 +88,17 @@ done
 for PHP_VER in "${PHP_VERS[@]}"
 do
   phpbrew use $PHP_VER
-  phpbrew ext install mongo
-  mv $PHP_BREW_DIR/php/php-$PHP_VER $PHP_INSTALL_DIR/php-$PHP_VER
+  if phpbrew ext install mongo ; then
+    mv $PHP_BREW_DIR/php/php-$PHP_VER $PHP_INSTALL_DIR/php-$PHP_VER
+  else
+    echo "Installing mongo failed for $PHP_VER"
+    if [ -f $PHP_BREW_DIR/build/php-$PHP_VER/ext/mongo/build.log ]; then
+      tail -200 $PHP_BREW_DIR/build/php-$PHP_VER/ext/mongo/build.log
+    else
+      echo "Mongo build log missing"
+      exit 1
+    fi
+  fi
 done
 
 # Clean up
