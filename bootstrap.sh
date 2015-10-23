@@ -4,9 +4,9 @@ set -x
 
 # PHP Version to build.  We build 5.3, 5.4, 5.5, and 5.6.
 PHP_5_3="5.3.29"
-PHP_5_4="5.4.45"
-PHP_5_5="5.5.30"
-PHP_5_6="5.6.14"
+PHP_5_4="5.4.38"
+PHP_5_5="5.5.22"
+PHP_5_6="5.6.6"
 # Array with php version to compile
 PHP_VERS=($PHP_5_3 $PHP_5_4 $PHP_5_5 $PHP_5_6)
 
@@ -94,6 +94,7 @@ do
     echo "Installing mongo failed for $PHP_VER"
     if [ -f $PHP_BREW_DIR/build/php-$PHP_VER/ext/mongo/build.log ]; then
       tail -200 $PHP_BREW_DIR/build/php-$PHP_VER/ext/mongo/build.log
+      exit 1
     else
       echo "Mongo build log missing"
       exit 1
