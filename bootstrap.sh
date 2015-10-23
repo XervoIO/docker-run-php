@@ -11,7 +11,9 @@ PHP_5_6="5.6.6"
 PHP_VERS=($PHP_5_3 $PHP_5_4 $PHP_5_5 $PHP_5_6)
 
 # Variables
-PHP_BREW_DIR=/mnt/home/.phpbrew
+export HOME=/root
+export TEMP_DIR=/root/tmp
+PHP_BREW_DIR=$HOME/.phpbrew
 PHP_INSTALL_DIR=/opt/modulus/php
 PHP_BREW_FLAGS="+default +mysql +pgsql +fpm +soap +gmp -- \
   --with-libdir=lib/x86_64-linux-gnu --with-gd=shared --enable-gd-natf \
@@ -52,7 +54,7 @@ chmod +x phpbrew
 mv phpbrew /usr/bin/phpbrew
 
 # phpbrew must be initialized to work.  Will create the folder
-# /mnt/home/.phpbrew
+# ~/.phpbrew
 phpbrew init
 source ~/.phpbrew/bashrc
 
