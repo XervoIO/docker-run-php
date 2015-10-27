@@ -2,13 +2,14 @@
 set -e
 set -x
 
-# PHP Version to build.  We build 5.3, 5.4, 5.5, and 5.6.
-PHP_5_3="5.3.29"
-PHP_5_4="5.4.38"
-PHP_5_5="5.5.22"
-PHP_5_6="5.6.6"
-# Array with php version to compile
-PHP_VERS=($PHP_5_3 $PHP_5_4 $PHP_5_5 $PHP_5_6)
+# PHP Version to build.  We build 5.6
+PHP_5_6="5.6.14"
+PHP_7_0="7.0.0"
+# Array with php version to compile.
+# NOTE: PHP 7 has a different install command, its not currently in the
+# automated build list.
+PHP_VERS=($PHP_5_6)
+BUILD_PHP_7=true
 
 # Variables
 export HOME=/root
@@ -82,6 +83,22 @@ do
     fi
   fi
 done
+
+if [ $BUILD_PHP_7 ]; then
+  PHP_VER=$PHP_7_0
+  if phpbrew install next as php-$PHP_7_0 $PHP_BREW_FLAGS; then
+    echo "clear_env = no" >> $PHP_BREW_DIR/php/php-$PHP_VER/etc/php-fpm.conf
+    # Add PHP 7 to build list to install Mongo
+    PHP_VERS+=($PHP_7_0)
+  else
+    if [ -f $PHP_BREW_DIR/build/php-$PHP_VER/build.log ]; then
+      tail -200 $PHP_BREW_DIR/build/php-$PHP_VER/build.log
+    else
+      echo "Build failed, no log file created."
+      exit 1
+    fi
+  fi
+fi
 
 # Install MONGO support
 # NOTE:  We run this out of the other loop because if we run this in the other
