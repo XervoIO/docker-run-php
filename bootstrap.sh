@@ -2,13 +2,8 @@
 set -e
 set -x
 
-# PHP Version to build.  We build 5.3, 5.4, 5.5, and 5.6.
-PHP_5_3="5.3.29"
-PHP_5_4="5.4.38"
-PHP_5_5="5.5.22"
-PHP_5_6="5.6.6"
-# Array with php version to compile
-PHP_VERS=($PHP_5_3 $PHP_5_4 $PHP_5_5 $PHP_5_6)
+# PHP Version to build.
+PHP_VER="5.6.6"
 
 # Variables
 export HOME=/root
@@ -69,40 +64,34 @@ if [ ! -f /usr/include/gmp.h ]; then
 fi
 
 # Install PHP
-for PHP_VER in "${PHP_VERS[@]}"
-do
-  if phpbrew install php-$PHP_VER $PHP_BREW_FLAGS ; then
-    echo "clear_env = no" >> $PHP_BREW_DIR/php/php-$PHP_VER/etc/php-fpm.conf
+if phpbrew install php-$PHP_VER $PHP_BREW_FLAGS ; then
+  echo "clear_env = no" >> $PHP_BREW_DIR/php/php-$PHP_VER/etc/php-fpm.conf
+else
+  if [ -f $PHP_BREW_DIR/build/php-$PHP_VER/build.log ]; then
+    tail -200 $PHP_BREW_DIR/build/php-$PHP_VER/build.log
   else
-    if [ -f $PHP_BREW_DIR/build/php-$PHP_VER/build.log ]; then
-      tail -200 $PHP_BREW_DIR/build/php-$PHP_VER/build.log
-    else
-      echo "Build failed, no log file created."
-      exit 1
-    fi
+    echo "Build failed, no log file created."
+    exit 1
   fi
-done
+fi
 
 # Install MONGO support
 # NOTE:  We run this out of the other loop because if we run this in the other
 # loop, the installation of PHP 5.4 will almost always fail because reasons.
 # (I really don't know why it fails, phpbrew just fails to install it)
-for PHP_VER in "${PHP_VERS[@]}"
-do
-  phpbrew use $PHP_VER
-  if phpbrew ext install mongo ; then
-    mv $PHP_BREW_DIR/php/php-$PHP_VER $PHP_INSTALL_DIR/php-$PHP_VER
+phpbrew use $PHP_VER
+if phpbrew ext install mongo ; then
+  ln -s $PHP_BREW_DIR/php/php-$PHP_VER $PHP_INSTALL_DIR/php-$PHP_VER
+else
+  echo "Installing mongo failed for $PHP_VER"
+  if [ -f $PHP_BREW_DIR/build/php-$PHP_VER/ext/mongo/build.log ]; then
+    tail -200 $PHP_BREW_DIR/build/php-$PHP_VER/ext/mongo/build.log
+    exit 1
   else
-    echo "Installing mongo failed for $PHP_VER"
-    if [ -f $PHP_BREW_DIR/build/php-$PHP_VER/ext/mongo/build.log ]; then
-      tail -200 $PHP_BREW_DIR/build/php-$PHP_VER/ext/mongo/build.log
-      exit 1
-    else
-      echo "Mongo build log missing"
-      exit 1
-    fi
+    echo "Mongo build log missing"
+    exit 1
   fi
-done
+fi
 
 # Clean up
-rm -rf $PHP_BREW_DIR
+rm -rf $PHP_BREW_DIR/build
