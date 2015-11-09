@@ -4,16 +4,15 @@ set -x
 
 # PHP Version to build.
 export PHP_VER="5.6.6"
+
+# Variables
+export HOME=/home/mop
 export PHP_BREW_DIR=$HOME/.phpbrew
 export PHP_INSTALL_DIR=/opt/modulus/php
-export HOME=/mnt/home
 export TEMP_DIR=$HOME/tmp
 export TMP_DIR=$TEMP_DIR
 export TMPDIR=$TEMP_DIR
 
-# Variables
-export HOME=/mnt/home
-export TEMP_DIR=$HOME/tmp
 #export TEMP_DIR=/$HOME/tmp
 PHP_INSTALL_DIR=/opt/modulus/php
 

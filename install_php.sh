@@ -6,9 +6,9 @@ set -x
 export PHP_VER="5.6.6"
 
 # Variables
+HOME=/home/mop
 PHP_BREW_DIR=$HOME/.phpbrew
 PHP_INSTALL_DIR=/opt/modulus/php
-HOME=/mnt/home
 TEMP_DIR=$HOME/tmp
 TMP_DIR=$TEMP_DIR
 TMPDIR=$TEMP_DIR
