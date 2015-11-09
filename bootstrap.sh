@@ -2,9 +2,20 @@
 set -e
 set -x
 
+# PHP Version to build.
+export PHP_VER="5.6.6"
+export PHP_BREW_DIR=$HOME/.phpbrew
+export PHP_INSTALL_DIR=/opt/modulus/php
+export HOME=/mnt/home
+export TEMP_DIR=$HOME/tmp
+export TMP_DIR=$TEMP_DIR
+export TMPDIR=$TEMP_DIR
+
 # Variables
 export HOME=/mnt/home
-export TEMP_DIR=/$HOME/tmp
+export TEMP_DIR=$HOME/tmp
+#export TEMP_DIR=/$HOME/tmp
+PHP_INSTALL_DIR=/opt/modulus/php
 
 # Allows compiling with all cpus
 export MAKEFLAGS="-j $(grep -c ^processor /proc/cpuinfo)"
@@ -23,6 +34,9 @@ mkdir /var/lib/nginx/fastcgi
 mkdir /var/lib/nginx/uwsgi
 mkdir /var/lib/nginx/scgi
 mkdir -p $PHP_INSTALL_DIR
+mkdir $HOME
+mkdir $TEMP_DIR
+chown -R mop:mop $HOME
 
 # Install php 5 to run phpbrew
 mkdir /mnt/tmp
@@ -39,3 +53,17 @@ apt-get install -y php5 php5-dev php-pear autoconf automake php5-gd curl \
 curl -L -O https://github.com/phpbrew/phpbrew/raw/master/phpbrew
 chmod +x phpbrew
 mv phpbrew /usr/bin/phpbrew
+
+# GMP requires gmp.h to be in /usr/include
+if [ ! -f /usr/include/gmp.h ]; then
+  if [ -f /usr/include/x86_64-linux-gnu/gmp.h ]; then
+    ln -s /usr/include/x86_64-linux-gnu/gmp.h /usr/include/gmp.h
+  else
+    echo "gmp.h not found in /usr/include/x86_64-linux-gnu, can't build."
+    exit 1
+  fi
+fi
+
+# Install PHP as mop user
+sudo -u mop /opt/modulus/install_php.sh
+ln -s $PHP_BREW_DIR/php/php-$PHP_VER $PHP_INSTALL_DIR/php-$PHP_VER
