@@ -2,9 +2,6 @@
 set -e
 set -x
 
-# PHP Version to build.
-export PHP_VER="5.6.6"
-
 # Variables
 HOME=/home/mop
 PHP_BREW_DIR=$HOME/.phpbrew
@@ -25,9 +22,7 @@ phpbrew init
 source ~/.phpbrew/bashrc
 
 # Install PHP
-if phpbrew install php-$PHP_VER $PHP_BREW_FLAGS ; then
-  echo "clear_env = no" >> $PHP_BREW_DIR/php/php-$PHP_VER/etc/php-fpm.conf
-else
+if ! phpbrew install php-$PHP_VER $PHP_BREW_FLAGS ; then
   if [ -f $PHP_BREW_DIR/build/php-$PHP_VER/build.log ]; then
     tail -200 $PHP_BREW_DIR/build/php-$PHP_VER/build.log
     exit 1

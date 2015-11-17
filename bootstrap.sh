@@ -3,7 +3,7 @@ set -e
 set -x
 
 # PHP Version to build.
-export PHP_VER="5.6.6"
+export PHP_VER="5.6.15"
 
 # Variables
 export HOME=/home/mop
@@ -64,5 +64,5 @@ if [ ! -f /usr/include/gmp.h ]; then
 fi
 
 # Install PHP as mop user
-sudo -u mop /opt/modulus/install_php.sh
+sudo -u mop PHP_VER=$PHP_VER /opt/modulus/install_php.sh
 ln -s $PHP_BREW_DIR/php/php-$PHP_VER $PHP_INSTALL_DIR/php-$PHP_VER

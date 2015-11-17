@@ -4,14 +4,14 @@ set -e
 mkdir -p /mnt/tmp/nginx
 mkdir -p /mnt/home/nginx
 
-PHPVERSION=php-5.4.38
+PHPVERSION=php-5.6.15
 PHPINI=/mnt/home/php.ini
 PHPFPMCONF=/mnt/home/php-fpm.conf
 
 PHPPID=/mnt/home/php-fpm.pid
 NGINXPID=/mnt/home/nginx.pid
 
-AVAILABLE=( "5.3.29" "5.4.38" "5.5.22" "5.6.6" )
+AVAILABLE=( "5.6.15" )
 
 if [[ $MODULUS_CONFIG_ENGINES_PHP ]]; then
   for version in "${AVAILABLE[@]}"; do
@@ -24,13 +24,8 @@ fi
 SOURCEPHPINI=/opt/modulus/php/$PHPVERSION/etc/php.ini
 SOURCEPHPFPMCONF=/opt/modulus/php/$PHPVERSION/etc/php-fpm.conf
 
-rm -rf $PHPFPMCONF || true
-rm -rf $PHPINI || true
-
-SCALE=.75
-MEMORY_SIZE=$(node -p "Math.floor($SERVO_SIZE * $SCALE)" 2> /dev/null)
-sed -e 's/memory_limit = \(.*\)/memory_limit = '$MEMORY_SIZE'M/g' $SOURCEPHPINI > $PHPINI
-sed -e 's/memory_limit = \(.*\)/memory_limit = '$MEMORY_SIZE'M/g' $SOURCEPHPFPMCONF > $PHPFPMCONF
+cp $SOURCEPHPINI $PHPINI
+cp $SOURCEPHPFPMCONF $PHPFPMCONF
 
 # If the user specified config files, use as-is.
 if [ -f /mnt/app/php.ini ]; then
@@ -40,6 +35,18 @@ fi
 if [ -f /mnt/app/php-fpm.conf ]; then
   cp /mnt/app/php-fpm.conf $PHPFPMCONF
 fi
+
+# Set PHP Memory limit
+SCALE=.75
+MEMORY_SIZE=$(node -p "Math.floor($SERVO_SIZE * $SCALE)" 2> /dev/null)
+sed -i 's/memory_limit = \(.*\)/memory_limit = '$MEMORY_SIZE'M/g' $PHPINI
+sed -i 's/memory_limit = \(.*\)/memory_limit = '$MEMORY_SIZE'M/g' $PHPFPMCONF
+
+# Set the php-fpm.sock location
+sed -i 's/listen = \(.*\)/listen = \/mnt\/home\/php-fpm.sock/g' $PHPFPMCONF
+
+# Set clear_env to no to allow fpm to use passed environmental variables
+sed -i 's/;clear_env = \(.*\)/clear_env = no/g' $PHPFPMCONF
 
 /opt/modulus/php/$PHPVERSION/sbin/php-fpm -c $PHPINI -y $PHPFPMCONF &
 nginx -c /etc/nginx/nginx.conf &
