@@ -27,7 +27,7 @@ SOURCEPHPFPMCONF=/opt/modulus/php/$PHPVERSION/etc/php-fpm.conf
 cp $SOURCEPHPINI $PHPINI
 cp $SOURCEPHPFPMCONF $PHPFPMCONF
 
-# If the user specified config files, use as-is.
+# If the user specified config files, use them.
 if [ -f /mnt/app/php.ini ]; then
   cp /mnt/app/php.ini $PHPINI
 fi
@@ -48,6 +48,9 @@ sed -i 's/listen = \(.*\)/listen = \/mnt\/home\/php-fpm.sock/g' $PHPFPMCONF
 # Set clear_env to no to allow fpm to use passed environmental variables
 sed -i 's/;clear_env = \(.*\)/clear_env = no/g' $PHPFPMCONF
 
+# Start php-fpm
 /opt/modulus/php/$PHPVERSION/sbin/php-fpm -c $PHPINI -y $PHPFPMCONF &
+
+# Start nginx
 nginx -c /etc/nginx/nginx.conf &
 wait
