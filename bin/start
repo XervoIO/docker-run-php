@@ -39,14 +39,21 @@ fi
 # Set PHP Memory limit
 SCALE=.75
 MEMORY_SIZE=$(node -p "Math.floor($SERVO_SIZE * $SCALE)" 2> /dev/null)
-sed -i 's/memory_limit = \(.*\)/memory_limit = '$MEMORY_SIZE'M/g' $PHPINI
-sed -i 's/memory_limit = \(.*\)/memory_limit = '$MEMORY_SIZE'M/g' $PHPFPMCONF
+if grep -Fq "memory_limit" $PHPINI; then
+  sed -i 's/memory_limit = \(.*\)/memory_limit = '$MEMORY_SIZE'M/g' $PHPINI
+else
+  echo "memory_limit = ${MEMORY_SIZE}M" >> $PHPINI
+fi
+
+# If memory limit is set in php-fpm.conf, comment it out as we don't want to
+# overwrite the php.ini settings.
+sed -e '/memory_limit/ s/^;*/;/' -i php-fpm.conf
 
 # Set the php-fpm.sock location
 sed -i 's/listen = \(.*\)/listen = \/mnt\/home\/php-fpm.sock/g' $PHPFPMCONF
 
 # Set clear_env to no to allow fpm to use passed environmental variables
-sed -i 's/;clear_env = \(.*\)/clear_env = no/g' $PHPFPMCONF
+sed -i 's/;?clear_env\(.*\)/clear_env = no/g' $PHPFPMCONF
 
 # Start php-fpm
 /opt/modulus/php/$PHPVERSION/sbin/php-fpm -c $PHPINI -y $PHPFPMCONF &
