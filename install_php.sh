@@ -11,7 +11,7 @@ TMP_DIR=$TEMP_DIR
 TMPDIR=$TEMP_DIR
 PHP_BREW_FLAGS="+default +mysql +pgsql +fpm +soap +gmp +gd +opcache -- \
   --with-libdir=lib/x86_64-linux-gnu --with-gd=shared --enable-gd-natf \
-  --with-jpeg-dir=/usr --with-png-dir=/usr"
+  --with-jpeg-dir=/usr --with-png-dir=/usr --with-gd"
 
 # Allows compiling with all cpus
 export MAKEFLAGS="-j $(grep -c ^processor /proc/cpuinfo)"
