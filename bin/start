@@ -47,7 +47,7 @@ fi
 
 # If memory limit is set in php-fpm.conf, comment it out as we don't want to
 # overwrite the php.ini settings.
-sed -e '/memory_limit/ s/^;*/;/' -i php-fpm.conf
+sed -i '/memory_limit/ s/^;*/;/' $PHPFPMCONF
 
 # Set the php-fpm.sock location
 sed -i 's/listen = \(.*\)/listen = \/mnt\/home\/php-fpm.sock/g' $PHPFPMCONF
