@@ -9,7 +9,7 @@ PHP_INSTALL_DIR=/opt/modulus/php
 TEMP_DIR=$HOME/tmp
 TMP_DIR=$TEMP_DIR
 TMPDIR=$TEMP_DIR
-PHP_BREW_FLAGS="+default +mysql +pgsql +fpm +soap +gmp -- \
+PHP_BREW_FLAGS="+default +mysql +pgsql +fpm +soap +gmp +gd +opcache -- \
   --with-libdir=lib/x86_64-linux-gnu --with-gd=shared --enable-gd-natf \
   --with-jpeg-dir=/usr --with-png-dir=/usr"
 
