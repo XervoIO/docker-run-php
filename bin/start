@@ -47,9 +47,9 @@ fi
 
 # always_populate_raw_post_data should be set to -1
 if grep -Fq ";always_populate_raw_post_data" $PHPINI; then
-  sed -i 's/;always_populate_raw_post_data\(.*\)/alwasy_populate_raw_post_data = -1' $PHPINI
+  set -i 's/;always_populate_raw_post_data\(.*\)/alwasy_populate_raw_post_data = -1' $PHPINI
 else if grep -Fq "always_populate_raw_post_data = " $PHPINI; then
-  sed -i 's/always_populate_raw_post_data\(.*\)/alwasy_populate_raw_post_data = -1' $PHPINI
+  set -i 's/always_populate_raw_post_data\(.*\)/alwasy_populate_raw_post_data = -1' $PHPINI
 fi
 
 # If memory limit is set in php-fpm.conf, comment it out as we don't want to
