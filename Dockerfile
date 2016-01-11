@@ -1,4 +1,4 @@
-FROM onmodulus/image-run-base:0.0.1
+FROM onmodulus/run-base
 
 ENV DEBIAN_FRONTEND noninteractive
 
