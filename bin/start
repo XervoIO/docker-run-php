@@ -53,7 +53,7 @@ sed -i '/memory_limit/ s/^;*/;/' $PHPFPMCONF
 sed -i 's/listen = \(.*\)/listen = \/mnt\/home\/php-fpm.sock/g' $PHPFPMCONF
 
 # Set clear_env to no to allow fpm to use passed environmental variables
-sed -i 's/;?clear_env\(.*\)/clear_env = no/g' $PHPFPMCONF
+sed -i 's/.*clear_env\(.*\)/clear_env = no/g' $PHPFPMCONF
 
 # Start php-fpm
 /opt/modulus/php/$PHPVERSION/sbin/php-fpm -c $PHPINI -y $PHPFPMCONF &
