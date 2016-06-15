@@ -3,7 +3,7 @@ set -e
 set -x
 
 # PHP Version to build.
-export PHP_VER="5.6.15"
+export PHP_VER="5.6.22"
 
 # Variables
 export HOME=/home/mop
