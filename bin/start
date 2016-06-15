@@ -4,14 +4,14 @@ set -e
 mkdir -p /mnt/tmp/nginx
 mkdir -p /mnt/home/nginx
 
-PHPVERSION=php-5.6.15
+PHPVERSION=$PHP_ENV
 PHPINI=/mnt/home/php.ini
 PHPFPMCONF=/mnt/home/php-fpm.conf
 
 PHPPID=/mnt/home/php-fpm.pid
 NGINXPID=/mnt/home/nginx.pid
 
-AVAILABLE=( "5.6.15" )
+AVAILABLE=( $PHP_ENV )
 
 if [[ $MODULUS_CONFIG_ENGINES_PHP ]]; then
   for version in "${AVAILABLE[@]}"; do
