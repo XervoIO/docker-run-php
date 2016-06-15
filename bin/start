@@ -4,7 +4,7 @@ set -e
 mkdir -p /mnt/tmp/nginx
 mkdir -p /mnt/home/nginx
 
-PHPVERSION=$PHP_VER
+PHPVERSION=php-$PHP_VER
 PHPINI=/mnt/home/php.ini
 PHPFPMCONF=/mnt/home/php-fpm.conf
 
