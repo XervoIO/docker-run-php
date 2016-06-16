@@ -36,7 +36,7 @@ fi
 # NOTE:  We run this out of the other loop because if we run this in the other
 # loop, the installation of PHP 5.4 will almost always fail because reasons.
 # (I really don't know why it fails, phpbrew just fails to install it)
-phpbrew use $PHP_VER
+phpbrew switch php-$PHP_VER
 if ! phpbrew ext install mongo ; then
   echo "Installing mongo failed for $PHP_VER"
   if [ -f $PHP_BREW_DIR/build/php-$PHP_VER/ext/mongo/build.log ]; then
