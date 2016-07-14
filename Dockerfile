@@ -1,7 +1,7 @@
 FROM onmodulus/run-base
 
 ENV DEBIAN_FRONTEND noninteractive
-ENV PHP_VER="5.6.22"
+ENV PHP_VER="5.6.23"
 
 ADD . /opt/modulus
 ENV PATH=/opt/modulus/bin:$PATH
